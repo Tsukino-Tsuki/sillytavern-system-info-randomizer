@@ -1,0 +1,39 @@
+<div id="sir-panel" class="wide100p">
+    <div class="inline-drawer">
+        <div class="inline-drawer-toggle inline-drawer-header standoutHeader">
+            <b>随机系统信息</b>
+            <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div>
+        </div>
+        <div class="inline-drawer-content">
+            <p class="sir-help">每次回复前，随机抽取标头并生成对应信息，再同步写入聊天变量。</p>
+            <div class="sir-toolbar">
+                <label class="checkbox_label"><input id="sir-enabled" type="checkbox">启用插件</label>
+                <label class="checkbox_label"><input id="sir-auto" type="checkbox">每次生成前刷新</label>
+            </div>
+            <label for="sir-titles">整段标题候选（每行一个；留空则省略标题）</label>
+            <textarea id="sir-titles" class="text_pole" rows="3" spellcheck="false"></textarea>
+            <div class="sir-section"><b>目标变量</b><span class="sir-help">同一份结果写入全部变量，最多 5 个</span></div>
+            <div id="sir-variables"></div>
+            <button id="sir-add-variable" class="menu_button" type="button">添加变量</button>
+            <div class="sir-section"><b>随机信息组</b><span class="sir-help">左侧标头、右侧内容分别随机；每个启用的信息组输出一行</span></div>
+            <p class="sir-help">模板每行一个候选，支持 <code>{{random::a::b::c}}</code> 和 <code>{{roll::1d9999}}</code>。也可选择 JS 随机串。</p>
+            <div id="sir-groups"></div>
+            <div class="sir-toolbar">
+                <select id="sir-preset" class="text_pole" aria-label="信息组预设"></select>
+                <button id="sir-add-group" class="menu_button" type="button">添加信息组</button>
+            </div>
+            <div class="sir-toolbar sir-actions">
+                <button id="sir-save" class="menu_button" type="button">保存设置</button>
+                <button id="sir-refresh" class="menu_button" type="button">立即随机并注入</button>
+            </div>
+            <div id="sir-status" class="sir-status" role="status" aria-live="polite"></div>
+            <details open>
+                <summary>当前聊天的注入结果</summary>
+                <pre id="sir-preview" class="sir-preview"></pre>
+            </details>
+            <p class="sir-help">在预设、世界书或提示词中放入下列任意一个读取宏。变量内容相同，通常选一个即可：</p>
+            <div id="sir-macros" class="sir-macros"></div>
+            <p class="sir-help">继续生成沿用当前结果；重新生成和新滑动回复重新随机。这里生成的是合成信息，所有标头及内容都可编辑。</p>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,7 @@
+node_modules/
+*.log
+browser-validation.json
+generation-validation.json
+browser-failure.png
+panel-*.png
+groups-*.png

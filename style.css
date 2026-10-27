@@ -1,0 +1,31 @@
+#sir-panel { width: 100%; min-width: 0; container-type: inline-size; }
+#sir-panel .sir-help { font-size: 0.9em; opacity: 0.8; line-height: 1.5; }
+#sir-panel .sir-toolbar { display: flex; align-items: end; gap: 8px; flex-wrap: wrap; }
+#sir-panel .sir-toolbar > select { flex: 1; min-width: 130px; }
+#sir-panel .sir-toolbar > .sir-field { flex: 1; min-width: 120px; }
+#sir-panel .sir-field { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+#sir-panel input, #sir-panel textarea, #sir-panel select { box-sizing: border-box; width: 100%; }
+#sir-panel input[type="checkbox"] { width: auto; }
+#sir-panel textarea { resize: vertical; line-height: 1.45; }
+#sir-panel .sir-section { display: flex; flex-direction: column; gap: 4px; margin-top: 16px; margin-bottom: 8px; }
+#sir-panel .sir-variable { display: flex; gap: 8px; align-items: end; margin-bottom: 8px; }
+#sir-panel .sir-variable > .sir-field { flex: 1; }
+#sir-panel .sir-group { min-width: 0; padding: 10px; margin: 12px 0; border: 1px solid var(--SmartThemeBorderColor); border-radius: 6px; }
+#sir-panel .sir-columns { display: grid; grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr); gap: 12px; margin-top: 10px; }
+#sir-panel .sir-value { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+#sir-panel .sir-value > label { display: flex; flex-direction: column; gap: 4px; }
+#sir-panel .sir-group textarea { min-height: 120px; }
+#sir-panel .sir-actions { position: sticky; bottom: 0; background: var(--SmartThemeBlurTintColor); padding: 8px 0; margin-top: 12px; }
+#sir-panel .sir-status { padding: 8px 0; line-height: 1.5; overflow-wrap: anywhere; }
+#sir-panel .sir-status[data-level="error"] { font-weight: bold; }
+#sir-panel .sir-preview { white-space: pre-wrap; overflow-wrap: anywhere; max-height: 360px; overflow-y: auto; padding: 10px; border: 1px solid var(--SmartThemeBorderColor); border-radius: 6px; }
+#sir-panel .sir-macros { display: flex; flex-direction: column; gap: 6px; overflow-wrap: anywhere; }
+#sir-panel .menu_button { width: auto; margin: 0; white-space: nowrap; }
+#sir-panel [hidden] { display: none !important; }
+@media (max-width: 700px) {
+    #sir-panel .sir-columns { grid-template-columns: minmax(0, 1fr); }
+    #sir-panel .sir-actions { position: static; }
+}
+@container (max-width: 480px) {
+    #sir-panel .sir-columns { grid-template-columns: minmax(0, 1fr); }
+}

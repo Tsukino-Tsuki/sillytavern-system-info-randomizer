@@ -1,0 +1,12 @@
+{
+  "display_name": "随机系统信息",
+  "loading_order": 100,
+  "requires": [],
+  "optional": [],
+  "js": "index.js",
+  "css": "style.css",
+  "author": "wwj",
+  "version": "1.0.0",
+  "homePage": "https://github.com/Tsukino-Tsuki/sillytavern-system-info-randomizer",
+  "auto_update": false
+}
