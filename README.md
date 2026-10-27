@@ -1,13 +1,13 @@
 # SillyTavern 随机系统信息
 
-作者：wwj · 版本：1.0.0
+作者：wwj · 版本：1.1.0
 
 一个独立的 SillyTavern 前端扩展。每次回复前，随机选择系统信息标头并生成对应数据，再把整段结果同步写入多个聊天变量。
 
 ## 使用
 
 1. 安装后刷新酒馆，在「扩展」中打开「随机系统信息」。
-2. 默认已提供 6 个信息组，可直接点击「立即随机并注入」预览。
+2. 默认已提供 20 个信息组，每次随机抽取 4–8 组并打乱顺序，可直接点击「立即随机并注入」预览。
 3. 在预设、世界书或其他需要的位置填入：
 
 ```text
@@ -42,7 +42,9 @@ SillyTavern/data/<你的用户目录>/extensions/sillytavern-system-info-randomi
 
 ## 随机范围
 
-整段标题有 6 个候选，例如 `System Information`、`System Metadata`、`Runtime Information`。每个启用的信息组输出一行，标头与内容分别抽取。
+整段标题有 6 个候选，例如 `System Information`、`System Metadata`、`Runtime Information`。每次从已启用组中无重复随机选取若干组，输出顺序也随机；选中组的标头与内容分别抽取。
+
+「每次最少抽取 / 每次最多抽取」默认 4 和 8，可设置为 1–30，最少不能大于最多。启用组不足时以实际数量为上限；两项设为相同数字可固定数量，顺序仍随机。数量不包含整段标题。
 
 | 默认组 | 标头候选示例 | 默认内容 |
 | --- | --- | --- |
@@ -50,18 +52,34 @@ SillyTavern/data/<你的用户目录>/extensions/sillytavern-system-info-randomi
 | 构建信息 | Build Number / Build Revision / Compilation ID | 构建版本或混合编号宏模板 |
 | 校验摘要 | Build Fingerprint / Artifact Checksum / Package Digest | JS 生成 64 位十六进制串 |
 | 指令集 | Instruction Set / ISA Profile / Execution ISA | 按架构匹配的指令集组合，加随机修订号 |
-| 序列标识 | Serial Number / Instance Serial / Module Serial | JS 生成 40 字符，每 8 字符分段 |
-| 诊断编号 | Test Run ID / Diagnostic Run ID / Validation Session ID | JS 生成 128 字符，每 8 字符分段 |
+| 序列标识 | Serial Number / Instance Serial / Module Serial | JS 生成 40 字符连续串 |
+| 诊断编号 | Test Run ID / Diagnostic Run ID / Validation Session ID | JS 生成 128 字符连续串 |
+| Linux 发行版 | Linux Distribution ID / Linux OS ID | debian、ubuntu、fedora 等标识 |
+| Linux 内核版本 | Linux Kernel Release / Linux Kernel Version | 随机内核版本形式及 generic / lts / rt 后缀 |
+| Linux 架构 | Linux Machine Architecture / Linux Kernel Architecture | x86_64、aarch64、armv7l、riscv64 |
+| Linux 机器标识 | Linux Machine ID / Linux Machine Identifier | 32 位小写十六进制串 |
+| Linux 启动标识 | Linux Boot ID / Linux Boot UUID | UUID v4 |
+| Linux 主机名称 | Linux Hostname / Linux Node Name | 随机主机名前缀和编号 |
+| Linux 系统构建 | Linux OS Build ID / Linux Image Build ID | 随机构建编号和通道标识 |
+| Windows 系统版本 | Windows OS Version / Windows NT Version | 10.0 加随机构建和修订号 |
+| Windows 构建号 | Windows Build Number / Windows OS Build Number | 数字构建号 |
+| Windows 架构 | Windows OS Architecture / Windows Platform Architecture | x64、ARM64、x86 |
+| Windows 系统角色 | Windows Product Role / Windows System Role | Workstation、DomainController、Server |
+| Windows 计算机名 | Windows Computer Name / Windows CSName | WIN 前缀加随机编号 |
+| Windows 序列标识 | Windows OS Serial Number / Windows Product Serial | 带连字符的随机序列串 |
+| Windows 系统目录 | Windows Directory / Windows Root Directory | Windows 路径候选 |
 
-每组内置 8 个标头，共 48 个。名称采用版本、构建、摘要、指令集、实例和诊断记录中常见的命名方式；这些是**合成信息**，不读取宿主机数据，也不是实际计算出的文件哈希。
+原有6组每组8个标头，Linux、Windows各新增7组、每组4个标头，共104个。名称参考系统信息字段，部分采用可读别名；这些是**合成信息**，不读取宿主机数据，也不是实际计算出的文件哈希。版本号不代表真实发布版本，Linux和Windows信息允许混合出现；同一段不保证描述一台真实存在的机器。
 
-面板可编辑所有标头和候选模板，并可增删、排序、停用信息组，最多 30 组。整段标题留空可省略。每次重新抽样，候选少时允许偶然抽到相同标头；不使用固定于聊天的 `pick` 宏。
+面板可编辑所有标头和候选模板，并可增删、调整编辑顺序、停用信息组，最多 30 组。编辑顺序不控制输出顺序。整段标题留空可省略。跨轮随机允许偶然抽到相同组和标头；不使用固定于聊天的 `pick` 宏。
+
+从1.0升级时自动补充新组和默认抽取范围，保留自定义标头、模板、变量名及原组启用状态。已有30组时不覆盖原组，仍可删除部分组后从预设菜单添加新组。新组只补充一次，之后删除的组不会在刷新时自行恢复。旧聊天快照保持原样，点击「立即随机并注入」或下次正常生成即可得到新格式；继续生成仍沿用旧快照。
 
 ## 内容生成方式
 
 - **酒馆宏 / 普通文本模板**：每行一个候选，JS 选中一条后交给酒馆原生宏函数展开。
-- **JS 字母数字串**：从 `a–z`、`0–9` 抽取，可设置 1–4096 字符及分段长度。
-- **JS 十六进制串**：从 `0–9`、`a–f` 抽取，长度及分段可调。
+- **JS 字母数字串**：从 `a–z`、`0–9` 抽取，可设置 1–4096 字符，连续输出。
+- **JS 十六进制串**：从 `0–9`、`a–f` 抽取，长度可调，连续输出。
 - **JS UUID v4**：生成标准形状的随机 UUID。
 
 JS 抽样使用浏览器 `crypto.getRandomValues`，采用拒绝采样避免取模偏差。无需填入或执行自定义 JavaScript 代码。
@@ -72,6 +90,8 @@ JS 抽样使用浏览器 `crypto.getRandomValues`，采用拒绝采样避免取�
 {{random::a::b::c::d}} {{roll::1d9999}} {{roll::1d9999}} {{roll::1d999}}
 build-{{roll::1d9}}.{{roll::1d99}}.{{roll::1d9999}}
 ```
+
+所有值在宏展开后统一去除空白（空格、制表符等），因此模板中的空格也不会保留。标头内部空格、标头后的 `: ` 和行间换行保留。例如 `Build Version: d 445 l p 1105 3068 6383 8471` 最终写入变量为 `Build Version: d445lp1105306863838471`。旧版JS分段选项已移除；连字符、点号、分号、路径分隔符等非空白字符保留。
 
 兼容旧写法 `{{random::a,b,c}}`、`{{roll 1d9999}}`。在传给酒馆前会把 roll 规范化成两套宏引擎都支持的形式。每个宏由当前酒馆解析器执行，所有输出在写变量前完成展开。
 
@@ -107,12 +127,20 @@ build-{{roll::1d9}}.{{roll::1d99}}.{{roll::1d9999}}
 npm test
 ```
 
-已通过 26 项单元测试、14 类酒馆集成检查，包含新旧宏引擎、五变量持久化、聊天隔离、真实生成请求构建、群聊及自动群聊。桌面与390px手机布局已目视检查。
+已通过33项单元测试。浏览器验收覆盖新旧宏引擎、抽取数量与紧凑值、1.0配置升级、五变量持久化、聊天隔离、真实生成请求构建、群聊及自动群聊，并检查桌面与390px手机布局。
 
 浏览器集成测试位于 `tests/browser-integration.cjs`，需要 Playwright 和独立酒馆测试实例。它会创建合成角色、设置和聊天，只应对隔离测试数据运行；默认地址 `http://127.0.0.1:8912`，测试实例中的插件目录名使用 `system-info-randomizer`。先运行它，再运行 `tests/browser-generation.cjs` 验证群聊。模型请求由浏览器拦截并返回模拟响应，没有调用真实付费模型。
 
 官方宏规则参考：`https://docs.sillytavern.app/usage/core-concepts/macros/`。
 
+系统字段参考：
+- systemd os-release：`https://www.freedesktop.org/software/systemd/man/latest/os-release.html`
+- systemd machine-id：`https://www.freedesktop.org/software/systemd/man/latest/machine-id.html`
+- Linux kernel sysctl：`https://docs.kernel.org/admin-guide/sysctl/kernel.html`
+- Microsoft Win32_OperatingSystem：`https://learn.microsoft.com/en-us/windows/win32/cimwin32prov/win32-operatingsystem`
+
+`tests/browser-migration.cjs` 可在相同隔离实例验证旧配置升级；它会覆盖该实例的插件设置，仅用于测试。
+
 ## 文件结构
 
-`presets.js` 内置候选；`random.js` JS 随机源；`templates.js` 宏校验与展开；`generator.js` 组合文本；`controller.js` 生成生命周期、聊天变量与保存；`persistence.js` 配置保存确认；`ui.js`、`ui-fields.js`、`settings.html`、`style.css` 设置界面。
+`presets.js` 和 `os-presets.js` 内置候选；`migration.js` 配置升级；`random.js` JS随机源与无重复抽样；`templates.js` 宏校验与展开；`generator.js` 组合文本；`controller.js` 生成生命周期、聊天变量与保存；`persistence.js` 配置保存确认；`ui.js`、`ui-fields.js`、`settings.html`、`style.css` 设置界面。

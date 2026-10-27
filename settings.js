@@ -17,7 +17,7 @@ function checkLines(lines, label, maxLength, allowEmpty = false) {
 }
 
 export function validateSettings(settings) {
-    if (settings.schemaVersion !== 1) throw new Error('不支持此配置版本');
+    if (settings.schemaVersion !== 2) throw new Error('不支持此配置版本');
     if (typeof settings.enabled !== 'boolean' || typeof settings.autoRefresh !== 'boolean') {
         throw new Error('启用和自动刷新设置无效');
     }
@@ -32,6 +32,10 @@ export function validateSettings(settings) {
         throw new Error('信息组数量须为 1–30 组');
     }
     if (!settings.groups.some((group) => group.enabled)) throw new Error('至少启用一个信息组');
+    if (!Number.isInteger(settings.minGroups) || !Number.isInteger(settings.maxGroups)
+        || settings.minGroups < 1 || settings.maxGroups > MAX_GROUPS || settings.minGroups > settings.maxGroups) {
+        throw new Error('每次抽取数量须为 1–30，且最少不能大于最多');
+    }
     settings.groups.forEach((group, index) => {
         const label = `第 ${index + 1} 组`;
         if (typeof group.enabled !== 'boolean' || typeof group.name !== 'string' || !group.name.trim()) {
@@ -42,9 +46,8 @@ export function validateSettings(settings) {
             throw new Error(`${label}标头请填写普通文字`);
         }
         if (!['template', 'alnum', 'hex', 'uuid'].includes(group.mode)) throw new Error(`${label}生成方式无效`);
-        if (!Number.isInteger(group.length) || group.length < 1 || group.length > 4096
-            || !Number.isInteger(group.chunk) || group.chunk < 0 || group.chunk > 128) {
-            throw new Error(`${label}长度须为1–4096，分段长度须为0–128（0表示不分段）`);
+        if (!Number.isInteger(group.length) || group.length < 1 || group.length > 4096) {
+            throw new Error(`${label}长度须为1–4096`);
         }
         if (group.mode === 'template') {
             checkLines(group.templates, `${label}模板`, 20000);

@@ -12,7 +12,19 @@ export function choose(items, index = randomIndex) {
     return items[index(items.length)];
 }
 
-export function randomIdentifier(mode, length, chunk, index = randomIndex) {
+export function randomSubset(items, minimum, maximum, index = randomIndex) {
+    const pool = [...items];
+    const low = Math.min(minimum, pool.length);
+    const high = Math.min(maximum, pool.length);
+    const count = low === high ? low : low + index(high - low + 1);
+    const selected = [];
+    while (selected.length < count) {
+        selected.push(pool.splice(pool.length === 1 ? 0 : index(pool.length), 1)[0]);
+    }
+    return selected;
+}
+
+export function randomIdentifier(mode, length, index = randomIndex) {
     if (mode === 'uuid') {
         const hex = Array.from({ length: 32 }, () => '0123456789abcdef'[index(16)]);
         hex[12] = '4';
@@ -21,9 +33,5 @@ export function randomIdentifier(mode, length, chunk, index = randomIndex) {
             .map((part) => part.join('')).join('-');
     }
     const alphabet = mode === 'hex' ? '0123456789abcdef' : 'abcdefghijklmnopqrstuvwxyz0123456789';
-    const result = Array.from({ length }, () => alphabet[index(alphabet.length)]).join('');
-    if (!chunk) return result;
-    const parts = [];
-    for (let start = 0; start < result.length; start += chunk) parts.push(result.slice(start, start + chunk));
-    return parts.join(' ');
+    return Array.from({ length }, () => alphabet[index(alphabet.length)]).join('');
 }

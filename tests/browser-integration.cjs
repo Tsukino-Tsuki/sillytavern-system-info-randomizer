@@ -74,6 +74,27 @@ const path = require('node:path');
         assert.equal(current.snapshot.text.includes('{{'), false);
         results.push('原生面板加载、首次生成、3变量相同、getvar读取已展开内容');
 
+        assert.equal(await page.locator('#sir-groups .sir-group').count(), 20);
+        await page.locator('#sir-min-groups').evaluate((input) => { input.value = '3'; });
+        await page.locator('#sir-max-groups').evaluate((input) => { input.value = '3'; });
+        await click('#sir-refresh'); await waitSaved();
+        current = await state();
+        assert.equal(current.settings.minGroups, 3);
+        assert.equal(current.snapshot.text.split('\n').length, 4);
+        for (const line of current.snapshot.text.split('\n').slice(1)) {
+            assert.doesNotMatch(line.slice(line.indexOf(': ') + 2), /\s/);
+        }
+        await page.locator('#sir-min-groups').evaluate((input) => { input.value = '9'; });
+        await click('#sir-save'); await waitSaved();
+        assert.match(await page.locator('#sir-status').textContent(), /最少不能大于最多/);
+        assert.equal((await state()).settings.minGroups, 3);
+        await page.locator('#sir-min-groups').evaluate((input) => { input.value = '4'; });
+        await page.locator('#sir-max-groups').evaluate((input) => { input.value = '8'; });
+        await click('#sir-refresh'); await waitSaved();
+        current = await state();
+        assert.ok(current.snapshot.text.split('\n').length >= 5 && current.snapshot.text.split('\n').length <= 9);
+        results.push('20组面板、可配置抽取数量、紧凑结果、非法范围拒绝保存');
+
         const compatibility = await page.evaluate(async () => {
             const { generateInformation } = await import('/scripts/extensions/third-party/system-info-randomizer/generator.js');
             const ctx = SillyTavern.getContext(), outputs = [];
@@ -82,13 +103,14 @@ const path = require('node:path');
                 for (const enabled of [false, true]) {
                     ctx.powerUserSettings.experimental_macro_engine = enabled;
                     const settings = structuredClone(ctx.extensionSettings['system-info-randomizer']);
+                    settings.groups = [settings.groups[0]];
                     settings.groups[0].templates = ['{{random::a,b}} {{random::a::b}} {{roll 1d999}} {{roll::1d9999}}'];
                     outputs.push(generateInformation(settings, (macro) => ctx.substituteParams(macro)));
                 }
             } finally { ctx.powerUserSettings.experimental_macro_engine = previous; }
             return outputs;
         });
-        compatibility.forEach((text) => assert.match(text.split('\n')[1], /: [ab] [ab] \d+ \d+$/));
+        compatibility.forEach((text) => assert.match(text.split('\n')[1], /: [ab]{2}\d+$/));
         results.push('新版与旧版宏引擎：逗号random、双冒号random、新旧roll均成功');
 
         for (const type of [undefined, 'regenerate', 'swipe']) {
@@ -161,6 +183,8 @@ const path = require('node:path');
         await select(nameA);
         assert.equal((await state()).snapshot.text, current.snapshot.text);
         assert.equal((await state()).settings.variableNames.length, 5);
+        assert.equal((await state()).settings.minGroups, 4);
+        assert.equal((await state()).settings.maxGroups, 8);
         assert.equal(await page.locator('#sir-variables input').count(), 5);
         results.push('页面刷新后设置及当前聊天结果恢复');
 

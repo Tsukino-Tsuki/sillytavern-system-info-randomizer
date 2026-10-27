@@ -59,12 +59,9 @@ export function groupCard(group, index, move, remove) {
     const template = inputField('信息候选模板（每行一个）', 'templates', group.templates.join('\n'), 'textarea');
     const numeric = document.createElement('div');
     numeric.className = 'sir-toolbar';
-    numeric.append(inputField('字符数（不含空格）', 'length', group.length, 'number'),
-        inputField('每段字符数（0不分段）', 'chunk', group.chunk, 'number'));
+    numeric.append(inputField('字符数（连续输出）', 'length', group.length, 'number'));
     numeric.querySelector('[data-field="length"]').min = '1';
     numeric.querySelector('[data-field="length"]').max = '4096';
-    numeric.querySelector('[data-field="chunk"]').min = '0';
-    numeric.querySelector('[data-field="chunk"]').max = '128';
     const toggle = () => {
         template.hidden = select.value !== 'template';
         numeric.hidden = !['hex', 'alnum'].includes(select.value);

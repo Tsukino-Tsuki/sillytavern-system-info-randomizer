@@ -1,4 +1,5 @@
 // 作者：wwj
+import { OS_PRESETS } from './os-presets.js';
 const letter = '{{random::a::b::c::d::e::f::g::h::i::j::k::l::m::n::o::p::q}}';
 const version = '{{roll::1d9}}.{{roll::1d99}}.{{roll::1d9999}}';
 
@@ -23,7 +24,7 @@ export const PRESETS = [
         name: '校验摘要',
         headers: ['Build Fingerprint', 'Artifact Checksum', 'Package Digest', 'Content Fingerprint',
             'Image Digest', 'Manifest Checksum', 'Verification Digest', 'Binary Fingerprint'],
-        mode: 'hex', length: 64, chunk: 0,
+        mode: 'hex', length: 64,
     },
     {
         name: '指令集',
@@ -38,24 +39,25 @@ export const PRESETS = [
         name: '序列标识',
         headers: ['Serial Number', 'System Serial', 'Instance Serial', 'Unit Serial Number',
             'Component Serial', 'Module Serial', 'Device Identifier', 'Instance Identifier'],
-        mode: 'alnum', length: 40, chunk: 8,
+        mode: 'alnum', length: 40,
     },
     {
         name: '诊断编号',
         headers: ['Test Run ID', 'Diagnostic Run ID', 'Validation Run ID', 'Verification Run ID',
             'Test Session ID', 'Diagnostic Session ID', 'Validation Session ID', 'Test Batch ID'],
-        mode: 'alnum', length: 128, chunk: 8,
+        mode: 'alnum', length: 128,
     },
+    ...OS_PRESETS,
 ];
 
 export function presetGroup(index) {
-    return { enabled: true, length: 32, chunk: 0, templates: ['{{roll::1d9999}}'],
+    return { enabled: true, length: 32, templates: ['{{roll::1d9999}}'],
         ...structuredClone(PRESETS[index]) };
 }
 
 export function defaultSettings() {
     return {
-        schemaVersion: 1, enabled: true, autoRefresh: true,
+        schemaVersion: 2, enabled: true, autoRefresh: true, minGroups: 4, maxGroups: 8,
         titles: ['System Information', 'Internal System Information', 'System Metadata',
             'Runtime Metadata', 'System Diagnostics', 'Runtime Information'],
         variableNames: ['system_information', 'system_information_2', 'system_information_3'],

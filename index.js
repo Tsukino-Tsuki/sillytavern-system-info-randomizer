@@ -1,5 +1,5 @@
 // 作者：wwj
-import { defaultSettings } from './presets.js';
+import { migrateSettings } from './migration.js';
 import { SETTINGS_KEY } from './settings.js';
 import { createController } from './controller.js';
 import { createUi } from './ui.js';
@@ -10,8 +10,10 @@ import { saveConfiguration } from './persistence.js';
 async function initialize() {
     if (document.getElementById('sir-panel')) return;
     const context = window.SillyTavern.getContext();
-    if (!context.extensionSettings[SETTINGS_KEY]) {
-        context.extensionSettings[SETTINGS_KEY] = defaultSettings();
+    const previous = context.extensionSettings[SETTINGS_KEY];
+    const settings = migrateSettings(previous);
+    if (settings !== previous) {
+        context.extensionSettings[SETTINGS_KEY] = settings;
         context.saveSettingsDebounced();
     }
     const response = await fetch(new URL('./settings.html', import.meta.url));

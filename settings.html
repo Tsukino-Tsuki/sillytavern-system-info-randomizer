@@ -5,7 +5,7 @@
             <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div>
         </div>
         <div class="inline-drawer-content">
-            <p class="sir-help">每次回复前，随机抽取标头并生成对应信息，再同步写入聊天变量。</p>
+            <p class="sir-help">每次回复前，随机选取若干信息组并打乱顺序，再随机标头和内容，同步写入聊天变量。</p>
             <div class="sir-toolbar">
                 <label class="checkbox_label"><input id="sir-enabled" type="checkbox">启用插件</label>
                 <label class="checkbox_label"><input id="sir-auto" type="checkbox">每次生成前刷新</label>
@@ -15,7 +15,12 @@
             <div class="sir-section"><b>目标变量</b><span class="sir-help">同一份结果写入全部变量，最多 5 个</span></div>
             <div id="sir-variables"></div>
             <button id="sir-add-variable" class="menu_button" type="button">添加变量</button>
-            <div class="sir-section"><b>随机信息组</b><span class="sir-help">左侧标头、右侧内容分别随机；每个启用的信息组输出一行</span></div>
+            <div class="sir-section"><b>随机信息组</b><span class="sir-help">从已启用组中无重复抽取；每个选中组输出一行，顺序每次随机</span></div>
+            <div class="sir-toolbar">
+                <label class="sir-field">每次最少抽取<input id="sir-min-groups" class="text_pole" type="number" min="1" max="30" step="1"></label>
+                <label class="sir-field">每次最多抽取<input id="sir-max-groups" class="text_pole" type="number" min="1" max="30" step="1"></label>
+            </div>
+            <p class="sir-help">默认每次抽取 4–8 组。启用组不足时按实际数量抽取；上下移动只调整编辑顺序。最终内容会移除所有空白，保留标头空格、冒号后的空格及行间换行。</p>
             <p class="sir-help">模板每行一个候选，支持 <code>{{random::a::b::c}}</code> 和 <code>{{roll::1d9999}}</code>。也可选择 JS 随机串。</p>
             <div id="sir-groups"></div>
             <div class="sir-toolbar">
